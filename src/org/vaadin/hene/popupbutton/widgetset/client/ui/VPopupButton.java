@@ -11,6 +11,7 @@ import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Event.NativePreviewEvent;
 import com.google.gwt.user.client.Window;
@@ -215,6 +216,7 @@ public class VPopupButton extends VButton implements Container,
 	}-*/;
 
 	private class LayoutPopup extends VOverlay {
+		private static final String Z_INDEX = "10000";
 
 		public static final String CLASSNAME = VPopupButton.CLASSNAME
 				+ "-popup";
@@ -225,6 +227,7 @@ public class VPopupButton extends VButton implements Container,
 
 		public LayoutPopup() {
 			super(false, false, true);
+			DOM.setStyleAttribute(getElement(), "zIndex", Z_INDEX);
 			setStyleName(CLASSNAME);
 		}
 
