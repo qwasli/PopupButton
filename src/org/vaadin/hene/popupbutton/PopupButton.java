@@ -48,6 +48,7 @@ public class PopupButton extends Button implements SingleComponentContainer {
 
 	private PopupButtonServerRpc rpc = new PopupButtonServerRpc() {
 
+		@Override
 		public void setPopupVisible(boolean visible) {
 			PopupButton.this.setPopupVisible(visible);
 		}
@@ -92,6 +93,31 @@ public class PopupButton extends Button implements SingleComponentContainer {
 	 */
 	public boolean isPopupVisible() {
 		return getState().popupVisible;
+	}
+
+	/**
+	 * 
+	 * Allows setting the auto hide behaviour of the popup.
+	 * 
+	 * @param popupAutoHide
+	 *            if true, popup will hide automatically if clicked outside
+	 *            otherwise it must be closed by clicking on the button or
+	 *            programmatically.
+	 */
+	public void setPopupAutoHide(boolean popupAutoHide) {
+		if (getState().popupAutoHide != popupAutoHide) {
+			getState().popupAutoHide = popupAutoHide;
+			markAsDirty();
+		}
+	}
+
+	/**
+	 * Checks if auto hide behaviour is enabled.
+	 * 
+	 * @return true, if auto hide is enabled, false otherwise
+	 */
+	public boolean isPopupAutoHide() {
+		return getState().popupAutoHide;
 	}
 
 	/**
