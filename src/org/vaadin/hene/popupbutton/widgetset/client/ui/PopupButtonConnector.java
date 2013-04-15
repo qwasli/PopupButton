@@ -6,13 +6,11 @@ import java.util.List;
 import org.vaadin.hene.popupbutton.PopupButton;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.Event.NativePreviewEvent;
-import com.google.gwt.user.client.Event.NativePreviewHandler;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.vaadin.client.ComponentConnector;
 import com.vaadin.client.ConnectorHierarchyChangeEvent;
 import com.vaadin.client.ConnectorHierarchyChangeEvent.ConnectorHierarchyChangeHandler;
@@ -30,7 +28,7 @@ import com.vaadin.shared.ui.Connect;
 @Connect(PopupButton.class)
 public class PopupButtonConnector extends ButtonConnector implements
 		HasComponentsConnector, ConnectorHierarchyChangeHandler,
-		PostLayoutListener, NativePreviewHandler {
+		PostLayoutListener, CloseHandler<PopupPanel> {
 
 	private PopupButtonServerRpc rpc = RpcProxy.create(
 			PopupButtonServerRpc.class, this);
@@ -46,7 +44,7 @@ public class PopupButtonConnector extends ButtonConnector implements
 	@Override
 	public void init() {
 		super.init();
-		nativePreviewHandler = Event.addNativePreviewHandler(this);
+		getWidget().popup.addCloseHandler(this);
 	}
 
 	@Override
@@ -62,6 +60,8 @@ public class PopupButtonConnector extends ButtonConnector implements
 	public void onClick(ClickEvent event) {
 		if (!popupVisible && isEnabled()) {
 			rpc.setPopupVisible(true);
+		} else if (isEnabled()) {
+			getWidget().popup.hide();
 		}
 		super.onClick(event);
 	}
@@ -104,9 +104,12 @@ public class PopupButtonConnector extends ButtonConnector implements
 						+ VPopupView.CLASSNAME
 						+ "-popup");
 			}
+			getWidget().popup.setAutoHideEnabled(getState().popupAutoHide);
+			getWidget().popup.addAutoHidePartner(getWidget().getElement());
 
 			getWidget().popup.setVisible(false);
 			getWidget().popup.show();
+
 			popupVisible = true;
 		} else {
 			getWidget().setPopupInvisible();
@@ -114,6 +117,7 @@ public class PopupButtonConnector extends ButtonConnector implements
 		}
 	}
 
+	@Override
 	public void onConnectorHierarchyChange(ConnectorHierarchyChangeEvent event) {
 		if (childrenComponentConnector == null) {
 			getWidget().hidePopup();
@@ -140,6 +144,7 @@ public class PopupButtonConnector extends ButtonConnector implements
 		return (PopupButtonState) super.getState();
 	}
 
+	@Override
 	public void updateCaption(ComponentConnector component) {
 		if (VCaption.isNeeded(component.getState())) {
 			if (getWidget().popup.getCaptionWrapper() != null) {
@@ -152,7 +157,7 @@ public class PopupButtonConnector extends ButtonConnector implements
 			}
 		} else {
 			if (getWidget().popup.getCaptionWrapper() != null) {
-				getWidget().popup.setWidget((Widget) getWidget().popup
+				getWidget().popup.setWidget(getWidget().popup
 						.getCaptionWrapper().getWrappedConnector().getWidget());
 			}
 		}
@@ -160,6 +165,7 @@ public class PopupButtonConnector extends ButtonConnector implements
 
 	private ComponentConnector childrenComponentConnector;
 
+	@Override
 	public List<ComponentConnector> getChildComponents() {
 		if (childrenComponentConnector == null) {
 			return Collections.<ComponentConnector> emptyList();
@@ -167,6 +173,7 @@ public class PopupButtonConnector extends ButtonConnector implements
 		return Collections.singletonList(childrenComponentConnector);
 	}
 
+	@Override
 	public void setChildComponents(List<ComponentConnector> children) {
 		if (children.size() > 1) {
 			throw new IllegalArgumentException("");
@@ -179,12 +186,14 @@ public class PopupButtonConnector extends ButtonConnector implements
 		}
 	}
 
+	@Override
 	public HandlerRegistration addConnectorHierarchyChangeHandler(
 			ConnectorHierarchyChangeHandler handler) {
 		return ensureHandlerManager().addHandler(
 				ConnectorHierarchyChangeEvent.TYPE, handler);
 	}
 
+	@Override
 	public void postLayout() {
 		if (popupVisible) {
 			getWidget().showPopup();
@@ -193,45 +202,14 @@ public class PopupButtonConnector extends ButtonConnector implements
 		}
 	}
 
-	public void onPreviewNativeEvent(NativePreviewEvent event) {
-		if (isEnabled()) {
-			Element target = Element
-					.as(event.getNativeEvent().getEventTarget());
-			switch (event.getTypeInt()) {
-			case Event.ONCLICK:
-				if (getWidget().isOrHasChildOfButton(target)) {
-					if (popupVisible) {
-						rpc.setPopupVisible(false);
-					}
-				}
-				break;
-			case Event.ONMOUSEDOWN:
-				if (!getWidget().isOrHasChildOfPopup(target)
-						&& !getWidget().isOrHasChildOfConsole(target)
-						&& !getWidget().isOrHasChildOfButton(target)) {
-					if (popupVisible) {
-						rpc.setPopupVisible(false);
-					}
-				}
-				break;
-			case Event.ONKEYPRESS:
-				// if (getWidget().isOrHasChildOfPopup(target)) {
-				// // Catch children that use keyboard, so we can unfocus
-				// // them
-				// // when
-				// // hiding
-				// activeChildren.add(target);
-				// }
-				break;
-			default:
-				break;
-			}
-		}
-	}
-
 	@Override
 	public boolean delegateCaptionHandling() {
 		return false;
+	}
+
+	@Override
+	public void onClose(CloseEvent<PopupPanel> event) {
+		rpc.setPopupVisible(false);
 	}
 
 }
