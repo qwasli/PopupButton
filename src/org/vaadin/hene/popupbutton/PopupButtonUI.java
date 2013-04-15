@@ -12,6 +12,7 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextArea;
@@ -69,6 +70,7 @@ public class PopupButtonUI extends UI {
 		listenerButton.setCaption("VisibilityListener");
 		listenerButton
 				.addPopupVisibilityListener(new PopupVisibilityListener() {
+					@Override
 					public void popupVisibilityChange(PopupVisibilityEvent event) {
 						String msg = "Popup closed";
 						if (event.getPopupButton().isPopupVisible()) {
@@ -84,7 +86,7 @@ public class PopupButtonUI extends UI {
 		cb.setInputPrompt("ComboBox");
 		comboBoxButton.setContent(cb);
 		horizontalLayout.addComponent(comboBoxButton);
-		
+
 		PopupButton tableButton = new PopupButton("Table in Popup");
 		Table table = new Table();
 		table.addContainerProperty("property1", String.class, "-");
@@ -92,10 +94,15 @@ public class PopupButtonUI extends UI {
 		table.addItem();
 		tableButton.setContent(table);
 		horizontalLayout.addComponent(tableButton);
-		
+
+		PopupButton noAutoHideButton = new PopupButton("Disable AutoHide");
+		noAutoHideButton.setPopupAutoHide(false);
+		noAutoHideButton.setContent(new Label("Some content"));
+		horizontalLayout.addComponent(noAutoHideButton);
 
 		Button openSubwindowButton = new Button("Open subwindow",
 				new ClickListener() {
+					@Override
 					public void buttonClick(ClickEvent event) {
 						Window w = new Window();
 						w.center();
