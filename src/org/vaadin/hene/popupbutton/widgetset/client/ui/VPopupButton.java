@@ -9,6 +9,7 @@ import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.HasWidgets;
@@ -129,7 +130,7 @@ public class VPopupButton extends VButton {
 	}-*/;
 
 	class LayoutPopup extends VOverlay {
-
+		private static final int Z_INDEX = 10000;
 		public static final String CLASSNAME = VPopupButton.CLASSNAME
 				+ "-popup";
 
@@ -185,6 +186,7 @@ public class VPopupButton extends VButton {
 		@Override
 		public void show() {
 			hiding = false;
+			setZIndex();
 			super.show();
 		}
 
@@ -230,6 +232,20 @@ public class VPopupButton extends VButton {
 		@Override
 		protected void setShadowStyle(String style) {
 			super.setShadowStyle(style);
+		}
+
+		public void setZIndex() {
+			Widget w = VPopupButton.this.getParent();
+			while (w != null) {
+				if (w instanceof VOverlay) {
+					String zi = DOM.getStyleAttribute(w.getElement(), "zIndex");
+					Integer i = new Integer(zi);
+					setZIndex(i + 1);
+					return;
+				}
+				w = w.getParent();
+			}
+			setZIndex(Z_INDEX);
 		}
 	}
 
