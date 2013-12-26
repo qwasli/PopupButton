@@ -1,28 +1,34 @@
 package org.vaadin.hene.popupbutton.widgetset.client.ui;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.vaadin.hene.popupbutton.PopupButton;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Event.NativePreviewEvent;
-import com.google.gwt.user.client.Event.NativePreviewHandler;
-import com.google.gwt.user.client.ui.Widget;
-import com.vaadin.client.*;
+import com.google.gwt.user.client.ui.PopupPanel;
+import com.vaadin.client.ComponentConnector;
+import com.vaadin.client.ConnectorHierarchyChangeEvent;
 import com.vaadin.client.ConnectorHierarchyChangeEvent.ConnectorHierarchyChangeHandler;
+import com.vaadin.client.HasComponentsConnector;
+import com.vaadin.client.VCaption;
+import com.vaadin.client.VCaptionWrapper;
 import com.vaadin.client.communication.RpcProxy;
 import com.vaadin.client.communication.StateChangeEvent;
 import com.vaadin.client.ui.button.ButtonConnector;
 import com.vaadin.shared.ui.Connect;
-import org.vaadin.hene.popupbutton.PopupButton;
-
-import java.util.Collections;
-import java.util.List;
 
 @SuppressWarnings("serial")
 @Connect(PopupButton.class)
 public class PopupButtonConnector extends ButtonConnector implements
-		HasComponentsConnector, ConnectorHierarchyChangeHandler, NativePreviewHandler {
+		HasComponentsConnector, ConnectorHierarchyChangeHandler,CloseHandler<PopupPanel> {
 
 	private PopupButtonServerRpc rpc = RpcProxy.create(
 			PopupButtonServerRpc.class, this);
@@ -36,7 +42,7 @@ public class PopupButtonConnector extends ButtonConnector implements
 	@Override
 	public void init() {
 		super.init();
-		nativePreviewHandler = Event.addNativePreviewHandler(this);
+		getWidget().popup.addCloseHandler(this);
 	}
 
 	@Override
@@ -52,6 +58,8 @@ public class PopupButtonConnector extends ButtonConnector implements
 	public void onClick(ClickEvent event) {
 		if (!getState().popupVisible && isEnabled()) {
 			rpc.setPopupVisible(true);
+		} else if (isEnabled()) {
+			getWidget().popup.hide();
 		}
 		super.onClick(event);
 	}
@@ -62,6 +70,7 @@ public class PopupButtonConnector extends ButtonConnector implements
 		getWidget().addStyleName(VPopupButton.CLASSNAME);
 	}
 
+	@Override
 	public void onConnectorHierarchyChange(ConnectorHierarchyChangeEvent event) {
 		if (getChildComponents().isEmpty()) {
             getWidget().hidePopup();
@@ -90,6 +99,7 @@ public class PopupButtonConnector extends ButtonConnector implements
 		return (PopupButtonState) super.getState();
 	}
 
+	@Override
 	public void updateCaption(ComponentConnector component) {
 		if (VCaption.isNeeded(component.getState())) {
 			if (getWidget().popup.getCaptionWrapper() != null) {
@@ -102,7 +112,7 @@ public class PopupButtonConnector extends ButtonConnector implements
 			}
 		} else {
 			if (getWidget().popup.getCaptionWrapper() != null) {
-				getWidget().popup.setWidget((Widget) getWidget().popup
+				getWidget().popup.setWidget(getWidget().popup
 						.getCaptionWrapper().getWrappedConnector().getWidget());
 			}
 		}
@@ -110,6 +120,7 @@ public class PopupButtonConnector extends ButtonConnector implements
 
 	private ComponentConnector childrenComponentConnector;
 
+	@Override
 	public List<ComponentConnector> getChildComponents() {
 		if (childrenComponentConnector == null) {
 			return Collections.<ComponentConnector> emptyList();
@@ -117,6 +128,7 @@ public class PopupButtonConnector extends ButtonConnector implements
 		return Collections.singletonList(childrenComponentConnector);
 	}
 
+	@Override
 	public void setChildComponents(List<ComponentConnector> children) {
 		if (children.size() > 1) {
 			throw new IllegalArgumentException("");
@@ -129,6 +141,7 @@ public class PopupButtonConnector extends ButtonConnector implements
 		}
 	}
 
+	@Override
 	public HandlerRegistration addConnectorHierarchyChangeHandler(
 			ConnectorHierarchyChangeHandler handler) {
 		return ensureHandlerManager().addHandler(
@@ -181,6 +194,11 @@ public class PopupButtonConnector extends ButtonConnector implements
 	@Override
 	public boolean delegateCaptionHandling() {
 		return false;
+	}
+
+	@Override
+	public void onClose(CloseEvent<PopupPanel> event) {
+		rpc.setPopupVisible(false);
 	}
 
 }

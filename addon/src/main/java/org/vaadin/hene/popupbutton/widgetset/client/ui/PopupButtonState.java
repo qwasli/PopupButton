@@ -10,5 +10,6 @@ public class PopupButtonState extends ButtonState {
 	public int xOffset = 0;
 	public int yOffset = 0;
 	public boolean popupFixedPosition;
+	public boolean popupAutoHide = true;
 
 }

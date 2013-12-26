@@ -1,16 +1,29 @@
 package org.vaadin.hene.popupbutton;
 
+import org.vaadin.hene.popupbutton.PopupButton.PopupVisibilityEvent;
+import org.vaadin.hene.popupbutton.PopupButton.PopupVisibilityListener;
+
 import com.vaadin.annotations.Title;
 import com.vaadin.data.Property;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
-import com.vaadin.ui.*;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.PopupDateField;
+import com.vaadin.ui.Table;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.Reindeer;
-import org.vaadin.hene.popupbutton.PopupButton.PopupVisibilityEvent;
-import org.vaadin.hene.popupbutton.PopupButton.PopupVisibilityListener;
 
 @SuppressWarnings("serial")
 @Title("PopupButton Application")
@@ -29,24 +42,24 @@ public class PopupButtonUI extends UI {
 		horizontalLayout.addComponent(createPopupButton());
 
 		PopupButton textCaptionButton = new PopupButton("Caption only");
-        textCaptionButton.setStyleName("style1");
-        textCaptionButton.addStyleName("style2");
+		textCaptionButton.setStyleName("style1");
+		textCaptionButton.addStyleName("style2");
 		final TextArea textArea = new TextArea("Multi-line TextField");
-        textArea.setImmediate(true);
-        textArea.addValueChangeListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-                Notification.show("" + event.getProperty().getValue());
-            }
-        });
-        textCaptionButton.addPopupVisibilityListener(new PopupVisibilityListener() {
-            @Override
-            public void popupVisibilityChange(PopupVisibilityEvent event) {
-                if (event.isPopupVisible()) {
-                    textArea.focus();
-                }
-            }
-        });
+		textArea.setImmediate(true);
+		textArea.addValueChangeListener(new Property.ValueChangeListener() {
+			@Override
+			public void valueChange(Property.ValueChangeEvent event) {
+				Notification.show("" + event.getProperty().getValue());
+			}
+		});
+		textCaptionButton.addPopupVisibilityListener(new PopupVisibilityListener() {
+			@Override
+			public void popupVisibilityChange(PopupVisibilityEvent event) {
+				if (event.isPopupVisible()) {
+					textArea.focus();
+				}
+			}
+		});
 		textArea.setRows(10);
 		textCaptionButton.setComponent(textArea);
 		horizontalLayout.addComponent(textCaptionButton);
@@ -74,33 +87,33 @@ public class PopupButtonUI extends UI {
 		userLayout.setComponentAlignment(removeUser, Alignment.MIDDLE_LEFT);
 
 		PopupButton listenerButton = new PopupButton();
-        final Button b = new Button("Click me!", new ClickListener() {
-            @Override
-            public void buttonClick(ClickEvent event) {
-                Notification.show("Button clicked!");
-            }
-        });
-        listenerButton.setContent(b);
+		final Button b = new Button("Click me!", new ClickListener() {
+			@Override
+			public void buttonClick(ClickEvent event) {
+				Notification.show("Button clicked!");
+			}
+		});
+		listenerButton.setContent(b);
 		listenerButton.setCaption("VisibilityListener");
-		listenerButton
-				.addPopupVisibilityListener(new PopupVisibilityListener() {
-					public void popupVisibilityChange(PopupVisibilityEvent event) {
-						String msg = "Popup closed";
-						if (event.getPopupButton().isPopupVisible()) {
-							msg = "Popup opened";
-                            b.setClickShortcut(ShortcutAction.KeyCode.ENTER);
-						} else {
-                            b.removeClickShortcut();
-                        }
-						Notification.show(msg);
-					}
-				});
+		listenerButton.addPopupVisibilityListener(new PopupVisibilityListener() {
+			@Override
+			public void popupVisibilityChange(PopupVisibilityEvent event) {
+				String msg = "Popup closed";
+				if (event.getPopupButton().isPopupVisible()) {
+					msg = "Popup opened";
+					b.setClickShortcut(ShortcutAction.KeyCode.ENTER);
+				} else {
+					b.removeClickShortcut();
+				}
+				Notification.show(msg);
+			}
+		});
 		horizontalLayout.addComponent(listenerButton);
 
 		PopupButton comboBoxButton = new PopupButton("ComboBox in Popup");
 		ComboBox cb = new ComboBox();
-        cb.addItem("Item 1");
-        cb.addItem("Item 2");
+		cb.addItem("Item 1");
+		cb.addItem("Item 2");
 		cb.setInputPrompt("ComboBox");
 		comboBoxButton.setContent(cb);
 		horizontalLayout.addComponent(comboBoxButton);
@@ -113,29 +126,32 @@ public class PopupButtonUI extends UI {
 		tableButton.setContent(table);
 		horizontalLayout.addComponent(tableButton);
 
+		PopupButton noAutoHideButton = new PopupButton("Disable AutoHide");
+		noAutoHideButton.setPopupAutoHide(false);
+		noAutoHideButton.setContent(new Label("Some content"));
+		horizontalLayout.addComponent(noAutoHideButton);
 
-		Button openSubwindowButton = new Button("Open subwindow",
-				new ClickListener() {
-					public void buttonClick(ClickEvent event) {
-						Window w = new Window();
-						w.center();
-                        PopupButton popupButton = new PopupButton();
-                        VerticalLayout l = new VerticalLayout();
-                        l.setMargin(true);
-                        l.setSpacing(true);
-                        l.addComponent(new PopupDateField());
-                        l.addComponent(createPopupButton());
-                        popupButton.setContent(l);
-						w.setContent(popupButton);
-						addWindow(w);
-					}
-				});
+		Button openSubwindowButton = new Button("Open subwindow", new ClickListener() {
+			@Override
+			public void buttonClick(ClickEvent event) {
+				Window w = new Window();
+				w.center();
+				PopupButton popupButton = new PopupButton();
+				VerticalLayout l = new VerticalLayout();
+				l.setMargin(true);
+				l.setSpacing(true);
+				l.addComponent(new PopupDateField());
+				l.addComponent(createPopupButton());
+				popupButton.setContent(l);
+				w.setContent(popupButton);
+				addWindow(w);
+			}
+		});
 		horizontalLayout.addComponent(openSubwindowButton);
 
-        horizontalLayout.addComponent(new PopupButton("No content"));
+		horizontalLayout.addComponent(new PopupButton("No content"));
 
-		Alignment[] aligns = new Alignment[] { Alignment.TOP_RIGHT,
-				Alignment.BOTTOM_LEFT, Alignment.BOTTOM_RIGHT };
+		Alignment[] aligns = new Alignment[] { Alignment.TOP_RIGHT, Alignment.BOTTOM_LEFT, Alignment.BOTTOM_RIGHT };
 		for (Alignment align : aligns) {
 			PopupButton b2 = createPopupButton();
 			mainLayout.addComponent(b2);
@@ -145,8 +161,7 @@ public class PopupButtonUI extends UI {
 
 	private PopupButton createPopupButton() {
 		PopupButton popupButton = new PopupButton("Add");
-		popupButton.setIcon(new ThemeResource(
-				"../runo/icons/16/document-add.png"));
+		popupButton.setIcon(new ThemeResource("../runo/icons/16/document-add.png"));
 
 		GridLayout gl = new GridLayout(4, 3);
 		gl.setWidth("150px");
