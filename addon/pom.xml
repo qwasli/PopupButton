@@ -4,7 +4,7 @@
 	<artifactId>popupbutton</artifactId>
 	<packaging>jar</packaging>
 	<groupId>org.vaadin.hene</groupId>
-	<version>2.3.0.qwas-SNAPSHOT</version>
+	<version>2.3.0.qwas</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
