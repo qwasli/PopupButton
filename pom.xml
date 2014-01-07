@@ -5,7 +5,7 @@
     <artifactId>popupbutton-root</artifactId>
     <packaging>pom</packaging>
     <description>PopupButton</description>
-    <version>2.3.0.qwas</version>
+    <version>2.3.0.qwas1</version>
     <name>PopupButton-root</name>
         <modules>
                 <module>addon</module>
