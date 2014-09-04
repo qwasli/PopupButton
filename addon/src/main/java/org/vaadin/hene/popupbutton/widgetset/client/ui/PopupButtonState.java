@@ -5,11 +5,11 @@ import com.vaadin.shared.ui.button.ButtonState;
 
 public class PopupButtonState extends ButtonState {
 
-	public boolean popupVisible;
-	public Connector popupPositionConnector;
-	public int xOffset = 0;
-	public int yOffset = 0;
-	public boolean popupFixedPosition;
-	public boolean popupAutoHide = true;
+    public boolean popupVisible;
+    public Connector popupPositionConnector;
+    public int xOffset = 0;
+    public int yOffset = 0;
+    public boolean popupFixedPosition;
+    public boolean popupAutoHide = true;
 
 }
