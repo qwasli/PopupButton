@@ -25,6 +25,7 @@ import com.vaadin.client.ui.VButton;
 import com.vaadin.client.ui.VOverlay;
 import com.vaadin.client.ui.VPopupView;
 import com.vaadin.client.ui.VRichTextArea;
+import com.vaadin.shared.ui.AlignmentInfo;
 
 // This class contains code from the VPopupView class.  
 public class VPopupButton extends VButton {
@@ -45,6 +46,8 @@ public class VPopupButton extends VButton {
     protected Widget popupPositionWidget;
 
     private final Set<Element> activeChildren = new HashSet<Element>();
+
+    private AlignmentInfo direction;
 
     public VPopupButton() {
         super();
@@ -70,6 +73,10 @@ public class VPopupButton extends VButton {
                     int extra = 20;
 
                     int left = getPopupPositionWidget().getAbsoluteLeft();
+                    if (direction.isHorizontalCenter()) {
+                        left -= (popup.getOffsetWidth() - getPopupPositionWidget()
+                                .getOffsetWidth()) / 2;
+                    }
                     int top = getPopupPositionWidget().getAbsoluteTop()
                             + getPopupPositionWidget().getOffsetHeight();
                     int browserWindowWidth = Window.getClientWidth()
@@ -151,6 +158,11 @@ public class VPopupButton extends VButton {
         }
     }
 
+    // Called by @DelegateToWidget
+    public void setDirection(int direction) {
+        this.direction = new AlignmentInfo(direction);
+    }
+
     class LayoutPopup extends VOverlay {
 
         public static final String CLASSNAME = VPopupButton.CLASSNAME
@@ -180,6 +192,7 @@ public class VPopupButton extends VButton {
          * opening.
          * 
          * (non-Javadoc)
+         * 
          * 
          * @see com.google.gwt.user.client.ui.Widget#getParent()
          */

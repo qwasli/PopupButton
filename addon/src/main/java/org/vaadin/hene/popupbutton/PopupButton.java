@@ -9,6 +9,7 @@ import org.vaadin.hene.popupbutton.widgetset.client.ui.PopupButtonServerRpc;
 import org.vaadin.hene.popupbutton.widgetset.client.ui.PopupButtonState;
 
 import com.vaadin.ui.AbstractSingleComponentContainer;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
@@ -38,6 +39,9 @@ public class PopupButton extends Button implements SingleComponentContainer {
 
     private Component component;
 
+    // This is here for getter because in the state we store int bitmask only
+    private Alignment direction;
+
     // These can be used by extending PopupButton.
     // It's possible that these are removed in future versions or functionality
     // is changed.
@@ -56,11 +60,13 @@ public class PopupButton extends Button implements SingleComponentContainer {
 
     public PopupButton() {
         registerRpc(rpc);
+        setDirection(Alignment.BOTTOM_RIGHT);
     }
 
     public PopupButton(String caption) {
         super(caption);
         registerRpc(rpc);
+        setDirection(Alignment.BOTTOM_RIGHT);
     }
 
     @Override
@@ -73,7 +79,11 @@ public class PopupButton extends Button implements SingleComponentContainer {
     }
 
     /**
-     * Shows or hides popup.
+     * Shows or hides popup. <<<<<<< HEAD
+     * 
+     * =======
+     *
+     * >>>>>>> upstream/2.4
      * 
      * @param popupVisible
      *            if true, popup is set to visible, otherwise popup is hidden.
@@ -106,7 +116,7 @@ public class PopupButton extends Button implements SingleComponentContainer {
 
     /**
      * Checks if the popup is visible.
-     * 
+     *
      * @return true, if popup is visible, false otherwise.
      */
     public boolean isPopupVisible() {
@@ -114,9 +124,9 @@ public class PopupButton extends Button implements SingleComponentContainer {
     }
 
     /**
-     * 
+     *
      * Allows setting the auto hide behaviour of the popup.
-     * 
+     *
      * @param popupAutoHide
      *            if true, popup will hide automatically if clicked outside
      *            otherwise it must be closed by clicking on the button or
@@ -131,7 +141,7 @@ public class PopupButton extends Button implements SingleComponentContainer {
 
     /**
      * Checks if auto hide behaviour is enabled.
-     * 
+     *
      * @return true, if auto hide is enabled, false otherwise
      */
     public boolean isPopupAutoHide() {
@@ -140,10 +150,10 @@ public class PopupButton extends Button implements SingleComponentContainer {
 
     /**
      * Set the content component of the popup.
-     * 
+     *
      * @param component
      *            the component to be displayed in the popup.
-     * @deprecated Use {@link setContent(Component content)} instead
+     * @deprecated Use {@link #setContent(com.vaadin.ui.Component)} instead
      */
     @Deprecated
     public void setComponent(Component component) {
@@ -162,15 +172,56 @@ public class PopupButton extends Button implements SingleComponentContainer {
     }
 
     /**
+     * Gets popup's opening direction.
+     */
+    public Alignment getDirection() {
+        return direction;
+    }
+
+    /**
+     * Sets opening direction for the popup. At the moment only support values
+     * are {@link com.vaadin.ui.Alignment#BOTTOM_LEFT} and
+     * {@link com.vaadin.ui.Alignment#BOTTOM_CENTER}.
+     *
+     * Default is {@link com.vaadin.ui.Alignment#BOTTOM_LEFT}.
+     */
+    public void setDirection(final Alignment direction) {
+        if (direction == null) {
+            throw new IllegalArgumentException("direction cannot be null");
+        }
+
+        this.direction = direction;
+        getState().direction = direction.getBitMask();
+    }
+
+    /**
+     * Is visibility of the popup toggled on a button click?
+     */
+    public boolean isButtonClickTogglesPopupVisibility() {
+        return getState().buttonClickTogglesPopupVisibility;
+    }
+
+    /**
+     * If true, clicking the button toggles visibility of the popup: a visible
+     * popup will be hidden, and an invisible popup will be shown.
+     *
+     * Default is true.
+     */
+    public void setButtonClickTogglesPopupVisibility(
+            boolean buttonClickTogglesPopupVisibility) {
+        getState().buttonClickTogglesPopupVisibility = buttonClickTogglesPopupVisibility;
+    }
+
+    /**
      * Add a listener that is called whenever the visibility of the popup is
      * changed.
-     * 
+     *
      * @param listener
      *            the listener to add
      * @see PopupVisibilityListener
      * @see PopupVisibilityEvent
      * @see #removePopupVisibilityListener(PopupVisibilityListener)
-     * 
+     *
      */
     public void addPopupVisibilityListener(PopupVisibilityListener listener) {
         addListener(PopupVisibilityEvent.class, listener,
@@ -180,7 +231,7 @@ public class PopupButton extends Button implements SingleComponentContainer {
     /**
      * Removes a previously added listener, so that it no longer receives events
      * when the visibility of the popup changes.
-     * 
+     *
      * @param listener
      *            the listener to remove
      * @see PopupVisibilityListener
@@ -196,7 +247,7 @@ public class PopupButton extends Button implements SingleComponentContainer {
      * visibility of the popup changes. You can get the new visibility directly
      * with {@link #isPopupVisible()}, or get the PopupButton that produced the
      * event with {@link #getPopupButton()}.
-     * 
+     *
      */
     public class PopupVisibilityEvent extends Event {
 
@@ -208,7 +259,7 @@ public class PopupButton extends Button implements SingleComponentContainer {
 
         /**
          * Get the PopupButton instance that is the source of this event.
-         * 
+         *
          * @return the source PopupButton
          */
         public PopupButton getPopupButton() {
@@ -217,7 +268,7 @@ public class PopupButton extends Button implements SingleComponentContainer {
 
         /**
          * Returns the current visibility of the popup.
-         * 
+         *
          * @return true if the popup is visible
          */
         public boolean isPopupVisible() {
@@ -228,18 +279,18 @@ public class PopupButton extends Button implements SingleComponentContainer {
     /**
      * Defines a listener that can receive a PopupVisibilityEvent when the
      * visibility of the popup changes.
-     * 
+     *
      */
     public interface PopupVisibilityListener extends Serializable {
         /**
-         * Pass to {@link PopupButton#PopupVisibilityEvent} to start listening
+         * Pass to {@link PopupButton.PopupVisibilityEvent} to start listening
          * for popup visibility changes.
-         * 
+         *
          * @param event
          *            the event
-         * 
-         * @see {@link PopupVisibilityEvent}
-         * @see {@link PopupButton#addPopupVisibilityListener(PopupVisibilityListener)}
+         *
+         * @see PopupVisibilityEvent
+         * @see PopupButton#addPopupVisibilityListener(PopupVisibilityListener)
          */
         public void popupVisibilityChange(PopupVisibilityEvent event);
     }

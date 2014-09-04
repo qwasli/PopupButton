@@ -12,6 +12,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Event.NativePreviewEvent;
 import com.google.gwt.user.client.Event.NativePreviewHandler;
+import com.google.gwt.user.client.ui.Widget;
 import com.vaadin.client.ComponentConnector;
 import com.vaadin.client.ConnectorHierarchyChangeEvent;
 import com.vaadin.client.ConnectorHierarchyChangeEvent.ConnectorHierarchyChangeHandler;
@@ -26,8 +27,7 @@ import com.vaadin.shared.ui.Connect;
 @SuppressWarnings("serial")
 @Connect(PopupButton.class)
 public class PopupButtonConnector extends ButtonConnector implements
-        HasComponentsConnector, ConnectorHierarchyChangeHandler,
-        NativePreviewHandler {
+        HasComponentsConnector, ConnectorHierarchyChangeHandler, NativePreviewHandler {
 
     private PopupButtonServerRpc rpc = RpcProxy.create(
             PopupButtonServerRpc.class, this);
@@ -55,10 +55,8 @@ public class PopupButtonConnector extends ButtonConnector implements
 
     @Override
     public void onClick(ClickEvent event) {
-        if (!getState().popupVisible && isEnabled()) {
+        if (!getState().popupVisible && isEnabled() && getState().buttonClickTogglesPopupVisibility) {
             rpc.setPopupVisible(true);
-        } else if (isEnabled()) {
-            getWidget().popup.hide();
         }
         super.onClick(event);
     }
@@ -69,7 +67,6 @@ public class PopupButtonConnector extends ButtonConnector implements
         getWidget().addStyleName(VPopupButton.CLASSNAME);
     }
 
-    @Override
     public void onConnectorHierarchyChange(ConnectorHierarchyChangeEvent event) {
         if (getChildComponents().isEmpty()) {
             getWidget().hidePopup();
@@ -98,7 +95,6 @@ public class PopupButtonConnector extends ButtonConnector implements
         return (PopupButtonState) super.getState();
     }
 
-    @Override
     public void updateCaption(ComponentConnector component) {
         if (VCaption.isNeeded(component.getState())) {
             if (getWidget().popup.getCaptionWrapper() != null) {
@@ -111,7 +107,7 @@ public class PopupButtonConnector extends ButtonConnector implements
             }
         } else {
             if (getWidget().popup.getCaptionWrapper() != null) {
-                getWidget().popup.setWidget(getWidget().popup
+                getWidget().popup.setWidget((Widget) getWidget().popup
                         .getCaptionWrapper().getWrappedConnector().getWidget());
             }
         }
@@ -119,7 +115,6 @@ public class PopupButtonConnector extends ButtonConnector implements
 
     private ComponentConnector childrenComponentConnector;
 
-    @Override
     public List<ComponentConnector> getChildComponents() {
         if (childrenComponentConnector == null) {
             return Collections.<ComponentConnector> emptyList();
@@ -127,7 +122,6 @@ public class PopupButtonConnector extends ButtonConnector implements
         return Collections.singletonList(childrenComponentConnector);
     }
 
-    @Override
     public void setChildComponents(List<ComponentConnector> children) {
         if (children.size() > 1) {
             throw new IllegalArgumentException("");
@@ -140,14 +134,12 @@ public class PopupButtonConnector extends ButtonConnector implements
         }
     }
 
-    @Override
     public HandlerRegistration addConnectorHierarchyChangeHandler(
             ConnectorHierarchyChangeHandler handler) {
         return ensureHandlerManager().addHandler(
                 ConnectorHierarchyChangeEvent.TYPE, handler);
     }
 
-    @Override
     public void onPreviewNativeEvent(NativePreviewEvent event) {
         if (isEnabled()) {
             Element target = Element
@@ -155,7 +147,7 @@ public class PopupButtonConnector extends ButtonConnector implements
             switch (event.getTypeInt()) {
             case Event.ONCLICK:
                 if (getWidget().isOrHasChildOfButton(target)) {
-                    if (getState().popupVisible) {
+                    if (getState().popupVisible && getState().buttonClickTogglesPopupVisibility) {
                         getWidget().sync();
                         rpc.setPopupVisible(false);
                     }
