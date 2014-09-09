@@ -8,7 +8,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<vaadin.version>7.1.9</vaadin.version>
+		<vaadin.version>7.3.0</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 
 		<!-- ZIP Manifest fields -->
@@ -71,6 +71,7 @@
 							<!-- Package format version - do not change -->
 							<Vaadin-Package-Version>1</Vaadin-Package-Version>
 							<Vaadin-Widgetsets>org.vaadin.hene.popupbutton.widgetset.PopupbuttonWidgetset</Vaadin-Widgetsets>
+							<Vaadin-Stylesheets>VAADIN/addons/popupbutton/popupbutton.scss</Vaadin-Stylesheets>
 						</manifestEntries>
 					</archive>
 				</configuration>

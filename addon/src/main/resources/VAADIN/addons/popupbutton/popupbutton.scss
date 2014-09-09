@@ -1,0 +1,34 @@
+@mixin popupbutton {
+	
+.v-popupbutton .v-button-caption {
+	display: inline-block;
+}
+
+.v-popupbutton .v-popup-indicator {
+	font-family: FontAwesome;
+	display: inline-block;
+	cursor: pointer;
+	height: $v-font-size;
+	width: $v-font-size;
+}
+
+.v-popupbutton .v-popup-indicator:after {
+	display: inline-block;
+	content: "\f0d7";
+}
+
+.v-popupbutton.v-disabled .v-popup-indicator {
+	cursor: default;
+}
+
+.v-popupbutton-popup.fixed {
+	position: fixed !important;
+	z-index: 20001 !important;
+}
+
+.v-shadow-fixed {
+	position: fixed !important;
+	z-index: 20000 !important;
+}
+
+}
